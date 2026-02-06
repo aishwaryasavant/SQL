@@ -1,0 +1,24 @@
+
+create table tasks (
+date_value date,
+state varchar(10)
+);
+
+insert into tasks  values (to_date('2019-01-01','yyyy-mm-dd'),'success');
+insert into tasks  values (to_date('2019-01-02','yyyy-mm-dd'),'success');
+insert into tasks  values (to_date('2019-01-03','yyyy-mm-dd'),'success');
+insert into tasks  values (to_date('2019-01-04','yyyy-mm-dd'),'fail');
+insert into tasks  values (to_date('2019-01-05','yyyy-mm-dd'),'fail');
+insert into tasks  values (to_date('2019-01-06','yyyy-mm-dd'),'success');
+
+select * from tasks t;
+
+select min( date_value),max(date_value),state from(
+select t.date_value,t.state, row_number()over(partition by state order by date_value) rk 
+,
+row_number() over(order by date_value),
+row_number()over(partition by state order by date_value)-row_number() over(order by date_value) cat
+from tasks t
+order by 1 
+)
+group by cat,state;
