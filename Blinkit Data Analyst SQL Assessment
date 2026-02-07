@@ -1,0 +1,57 @@
+CREATE TABLE Orders1 (
+    customer_id INT,
+    order_date DATE,
+    coupon_code VARCHAR(50)
+);
+
+TRUNCATE TABLE Orders1;
+
+select * from orders1;
+
+INSERT INTO Orders1 VALUES (1, to_date('2025-01-10','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (1, to_date('2025-02-05','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (1, to_date('2025-02-20','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (1, to_date('2025-03-01','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (1, to_date('2025-03-10','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (1, to_date('2025-03-15','yyyy-mm-dd'), 'DISC10'); -- last order with coupon ✅
+INSERT INTO Orders1 VALUES (2, to_date('2025-02-02','yyyy-mm-dd'), NULL);   -- Month1 = 1
+INSERT INTO Orders1 VALUES (2, to_date('2025-02-05','yyyy-mm-dd'), NULL);   -- Month1 = 1
+INSERT INTO Orders1 VALUES (2, to_date('2025-03-05','yyyy-mm-dd'), NULL);   -- Month2 = 2
+INSERT INTO Orders1 VALUES (2, to_date('2025-03-18','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (2, to_date('2025-03-20','yyyy-mm-dd'), NULL);   -- Month2 = 2
+INSERT INTO Orders1 VALUES (2, to_date('2025-03-22','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-02','yyyy-mm-dd'), NULL);   -- Month3 = 3
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-10','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-15','yyyy-mm-dd'), 'DISC20'); -- last order with coupon ✅
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-16','yyyy-mm-dd'), NULL);   -- Month3 = 3
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-18','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (2, to_date('2025-04-20','yyyy-mm-dd'), 'DISC20'); -- last order with coupon ✅
+
+-- ❌ Customer 3: First order in March but wrong multiples
+INSERT INTO Orders1 VALUES (3, to_date('2025-03-05','yyyy-mm-dd'), NULL);  -- Month1 = 1
+INSERT INTO Orders1 VALUES (3, to_date('2025-04-10','yyyy-mm-dd'), NULL);  -- Month2 should have 2, but only 1 ❌
+INSERT INTO Orders1 VALUES (3, to_date('2025-05-15','yyyy-mm-dd'), 'DISC30');
+
+-- ❌ Customer 4: First order in Feb but missing March (gap)
+INSERT INTO Orders1 VALUES (4, to_date('2025-02-01','yyyy-mm-dd'), NULL);  -- Month1
+INSERT INTO Orders1 VALUES (4, to_date('2025-04-05','yyyy-mm-dd'), 'DISC40'); -- Skipped March ❌
+
+-- ❌ Customer 5: Valid multiples but last order has no coupon
+INSERT INTO Orders1 VALUES (5, to_date('2025-01-03','yyyy-mm-dd'), NULL);  -- M1 = 1
+INSERT INTO Orders1 VALUES (5, to_date('2025-02-05','yyyy-mm-dd'), NULL);  -- M2 = 2
+INSERT INTO Orders1 VALUES (5, to_date('2025-02-15','yyyy-mm-dd'), NULL);
+INSERT INTO Orders1 VALUES (5, to_date('2025-03-01','yyyy-mm-dd'), NULL);  -- M3 = 3
+INSERT INTO Orders1 VALUES (5, to_date('2025-03-08','yyyy-mm-dd'), 'DISC50'); -- coupon mid
+INSERT INTO Orders1 VALUES (5, to_date('2025-03-20','yyyy-mm-dd'), NULL);     -- last order no coupon ❌
+
+-- ❌ Customer 6: Skips month 2, should be excluded
+INSERT INTO Orders1 VALUES (6, to_date('2025-01-05','yyyy-mm-dd'), NULL);     -- Month1 = 1 order
+-- (no Orders1 in Feb, so Month2 is missing ❌)
+INSERT INTO Orders1 VALUES (6, to_date('2025-03-02','yyyy-mm-dd'), NULL);     -- Month3 = 1st order
+INSERT INTO Orders1 VALUES (6, to_date('2025-03-15','yyyy-mm-dd'), NULL);     -- Month3 = 2nd order
+-- Jump to May (Month5 relative to Jan)
+INSERT INTO Orders1 VALUES (6, to_date('2025-05-05','yyyy-mm-dd'), NULL);     
+INSERT INTO Orders1 VALUES (6, to_date('2025-05-10','yyyy-mm-dd'), NULL);     
+INSERT INTO Orders1 VALUES (6, to_date('2025-05-25','yyyy-mm-dd'), 'DISC60'); -- Last order with coupon
+
+
