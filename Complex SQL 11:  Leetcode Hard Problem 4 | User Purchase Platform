@@ -1,0 +1,41 @@
+--------------------------------------------------------
+--  DDL for Table SPENDING
+--------------------------------------------------------
+/* data in the table. 
+1	01-JUL-19	mobile	100
+1	01-JUL-19	desktop	100
+2	01-JUL-19	mobile	100
+2	02-JUL-19	mobile	100
+3	01-JUL-19	desktop	100
+3	02-JUL-19	desktop	100
+*/
+  CREATE TABLE "AISH"."SPENDING" 
+   (	"USER_ID" NUMBER(*,0), 
+	"SPEND_DATE" DATE, 
+	"PLATFORM" VARCHAR2(10 BYTE), 
+	"AMOUNT" NUMBER(*,0)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 
+ NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
+  BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "USERS" ;
+
+SELECT * FROM SPENDING ORDER BY 2;
+
+with plat as(
+select s.spend_date,s.user_id,'both' platform,sum(amount)amount  FROM SPENDING S 
+group by s.spend_date,s.user_id having count(distinct platform)>1
+union all
+select s.spend_date,s.user_id,max(platform) platform,sum(amount) amount FROM SPENDING S 
+group by s.spend_date,s.user_id having count(distinct platform)=1
+union 
+select distinct s.spend_date,null,'both' platform,0 amount FROM SPENDING S 
+--group by s.spend_date,s.user_id having count(distinct platform)<1
+)
+select spend_date,count(user_id),max(platform),max(amount)
+from plat
+group by spend_date,platform
+
+
