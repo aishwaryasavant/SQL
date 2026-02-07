@@ -1,0 +1,43 @@
+
+
+with cte_number (num) as
+(
+    select 1  num from dual
+
+    union all
+
+    select num+1 num
+    from cte_number 
+    where num<6
+)
+select num from cte_number;
+
+
+
+create table sales (
+product_id int,
+period_start date,
+period_end date,
+average_daily_sales int
+);
+
+insert into sales values(1,to_date('2019-01-25','yyyy-mm-dd'),to_date('2019-02-28','yyyy-mm-dd'),100);
+insert into sales values(2,to_date('2018-12-01','yyyy-mm-dd'),to_date('2020-01-01','yyyy-mm-dd'),10);
+insert into sales values(3,to_date('2019-12-01','yyyy-mm-dd'),to_date('2020-01-31','yyyy-mm-dd'),1);
+
+select * from sales order by 2;
+
+
+with cal(dates) as (
+select to_date('2018-01-01','yyyy-mm-dd') dates from dual
+union all
+select dates+1 from cal
+where dates<to_date('2020-01-31','yyyy-mm-dd')
+)
+select s.product_id , sum(average_daily_sales), extract (year from dates) yr--s.product_id,sum(s.average_daily_sales) 
+from cal c 
+join sales s
+on c.dates between period_start and period_end
+group by s.product_id,extract (year from dates)
+order by 1
+
