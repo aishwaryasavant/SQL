@@ -1,3 +1,12 @@
+/*
+wirte a sql where
+1. Each of them places order in each of their 3 consecutive months of their first order 
+2. The number of orders in second month is exactly double than the number of orders in first month
+3. The number of orders in third month is exactly double than the number of orders in first month
+4. The last order(latest by date) was placed with a coupon code(coupon code is not null) 
+
+*/
+
 CREATE TABLE Orders1 (
     customer_id INT,
     order_date DATE,
@@ -54,4 +63,24 @@ INSERT INTO Orders1 VALUES (6, to_date('2025-05-05','yyyy-mm-dd'), NULL);
 INSERT INTO Orders1 VALUES (6, to_date('2025-05-10','yyyy-mm-dd'), NULL);     
 INSERT INTO Orders1 VALUES (6, to_date('2025-05-25','yyyy-mm-dd'), 'DISC60'); -- Last order with coupon
 
+select o2.customer_id,o2.mn,o2.min_od,o2.no_of_orders,o2.rk,o2.diff,o2.m2,o2.m3,o2.ord2,o2.ord3
+
+from (
+select o1.customer_id,o1.mn,o1.min_od,o1.no_of_orders,rank()over(partition by customer_id order by min_od) rk
+,mn-rank()over(partition by customer_id order by min_od) diff, 
+lead(mn,1)over(partition by customer_id order by min_od) m2, 
+lead(mn,2)over(partition by customer_id order by min_od) m3, 
+lead(no_of_orders,1) over(partition by customer_id order by min_od) ord2,
+lead(no_of_orders,2) over(partition by customer_id order by min_od) ord3
+from (
+ select  customer_id,to_char(order_date,'mm') mn, min(order_date) min_od,count(order_date) no_of_orders from orders1 o
+ group by customer_id,to_char(order_date,'mm')) o1)o2 
+ where ord2 = 2*no_of_orders and ord3=3*no_of_orders 
+ and m2-mn=1 and m3-m2 = 1
+ and customer_id in (
+ select customer_id from orders1 where 
+ (customer_id,order_date)in(select customer_id,max(order_date) from orders1
+ group by customer_id) and coupon_code is not null
+ ); 
+ 
 
