@@ -1,0 +1,16 @@
+/*update the gender value in the table from male to female and female to male */
+create table gender 
+(id int, 
+value varchar(10)); 
+
+
+insert into gender values(1, 'male');
+insert into gender values(2, 'male');
+insert into gender values(3, 'male');
+insert into gender values(4, 'female');
+insert into gender values(5, 'female');
+insert into gender values(6, 'female');
+
+select * from gender;
+
+update gender set value = case when value = 'male' then 'female' when value='female' then'male' end 
