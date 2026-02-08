@@ -1,0 +1,87 @@
+/* 
+SQL Interview Question By A Startup | Normal vs Mentos Life 😎
+In this video we will discuss an SQL interview online assess emnt question asked by an startup Vyapar. 
+
+Find the best employees and best clients in a department 
+
+*/
+truncate TABLE department;
+truncate table empdetails;
+truncate table client;
+CREATE TABLE department (
+    dep_id INT,
+    dep_name VARCHAR(50)
+);
+
+CREATE TABLE empdetails (
+    emp_id INT,
+    first_name VARCHAR(50),
+    gender VARCHAR(1),
+    dep_id INT
+);
+
+CREATE TABLE client (
+    client_id INT,
+    client_name VARCHAR(50)
+);
+
+CREATE TABLE empsales (
+    emp_id INT,
+    client_id INT,
+    sales INT
+);
+
+-- Insert data
+INSERT INTO department (dep_id, dep_name) VALUES
+(1, 'Electronics');
+INSERT INTO department (dep_id, dep_name) VALUES (2, 'Furniture');
+INSERT INTO department(dep_id, dep_name) VALUES (3, 'Clothing');
+
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES
+(101, 'Alice', 'F', 1);
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES(102, 'Bob', 'M', 1);
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES(103, 'Charlie', 'M', 2);
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES(104, 'Diana', 'F', 2);
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES(105, 'Ethan', 'M', 3);
+INSERT INTO empdetails (emp_id, first_name, gender, dep_id) VALUES(106, 'Fiona', 'F', 3);
+
+
+INSERT INTO client (client_id, client_name) VALUES(1, 'Amazon');
+INSERT INTO client (client_id, client_name) VALUES(2, 'Walmart');
+INSERT INTO client (client_id, client_name) VALUES(3, 'Costco');
+INSERT INTO client (client_id, client_name) VALUES(4, 'Target');
+INSERT INTO client (client_id, client_name) VALUES(5, 'BestBuy');
+
+INSERT INTO empsales (emp_id, client_id, sales) VALUES(101, 1, 5000);
+(101, 2, 3000);
+(102, 1, 7000);
+(102, 3, 2000);
+(103, 2, 4000);
+(103, 4, 3000);
+(104, 4, 6000);
+(105, 5, 8000);
+(106, 3, 5000);
+(106, 5, 2000);
+
+
+select * from empsales;
+select * from department;
+select * from empdetails;
+select * from client;
+
+with css as(
+select es.emp_id,sum(sales)over(partition by ed.dep_id, ed.emp_id) salesbyemp,sum(sales)over(partition by ed.dep_id,es.client_id) salesbyclient,
+client_id,ed.dep_id from empsales es 
+join empdetails ed
+on es.emp_id = ed.emp_id)
+,
+cs1 as(
+select  emp_id,salesbyemp,salesbyclient,rank()over(partition by dep_id order by salesbyemp desc) emprank,
+rank()over(partition by dep_id order by salesbyclient desc) salesrnk,
+client_id,
+dep_id, 'bestemp'  from css)
+
+select distinct a.emp_id,a.dep_id,b.client_id from cs1 a 
+join  cs1 b
+on a.dep_id = b.dep_id
+where a.emprank=1 and b.salesrnk=1;
