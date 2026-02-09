@@ -1,3 +1,7 @@
+/* 2 examples below 
+1. create a table with numbers less than 7
+2. create a table with start dates for jan-march
+*/
 
 
 with cte_number (num) as
@@ -12,6 +16,11 @@ with cte_number (num) as
 )
 select num from cte_number;
 
+with cte(num) as 
+(select to_date('01-jan-2025','dd-mon-yyyy') num from dual 
+union all
+select add_months(num,1) from cte where num< to_date('10-mar-2025','dd-mon-yyyy'))
+select * from cte;
 
 
 create table sales (
