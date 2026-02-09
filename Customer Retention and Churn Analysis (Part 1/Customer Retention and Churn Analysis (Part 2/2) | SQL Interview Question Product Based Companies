@@ -1,0 +1,16 @@
+/*Customer Retention and Churn Analysis (Part 2/2) | SQL Interview Question Product Based Companies
+Churn customers - find the number of customers that have ordered last month and not the current month 
+*/
+
+
+select count(mn_churn_rate),
+to_char(to_date('01-'||mn_churn_rate||'-2020','dd-mm-yyyy') ,'Month')
+from (
+select t.*, extract(month from add_months(order_date,1)) mn_churn_rate from (
+select t1.*, lead(order_date,1)over(partition by cust_id order by order_date) next_month from transactions t1 ) t 
+where next_month is null)
+group by to_char(to_date('01-'||mn_churn_rate||'-2020','dd-mm-yyyy') ,'Month'); 
+select t1.*, lead(order_date,1)over(partition by cust_id order by order_date) next_month from transactions t1;
+
+
+
