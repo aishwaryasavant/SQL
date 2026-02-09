@@ -1,0 +1,81 @@
+create table j1
+(id int );
+
+create table j2
+(id int );
+
+select * from j1; 
+select * from j2; 
+
+insert into j1 values(1);
+insert into j1 values(1);
+insert into j1 values(1);
+insert into j1 values(2);
+insert into j1 values(2);
+insert into j1 values(3);
+insert into j1 values(5);
+
+insert into j2 values(1);
+insert into j2 values(1);
+insert into j2 values(2);
+insert into j2 values(3);
+insert into j2 values(4);
+insert into j2 values(null);
+insert into j2 values(null);
+
+
+select * from j2;
+
+select * from j1 join j2
+on j1.id = j2.id
+;
+1	1
+1	1
+1	1
+1	1
+1	1
+1	1
+2	2
+2	2
+3	3
+;
+select * from j1 left join j2
+on j1.id = j2.id;
+1	1
+1	1
+1	1
+1	1
+1	1
+1	1
+2	2
+2	2
+3	3
+5	null
+;
+
+select * from j1 right join j2
+on j1.id = j2.id;
+1	1
+1	1
+1	1
+1	1
+1	1
+1	1
+2	2
+2	2
+3	3
+null	4
+null    null
+null    null
+	;
+    /*cross join is cartesian product of the tables pairing one row of the table with all rows from another table
+    m*n time data where m is rows from one table and n is rows from another table*/ 
+    select * from j1 cross join j2;
+    
+    /*its a combination of left join and right join 
+    returns matching recordds from left table
+    and returns matchin records from right table*/
+    
+        select * from j1 full outer join j2
+        on j1.id = j2.id;
+
