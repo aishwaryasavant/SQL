@@ -1,0 +1,18 @@
+/*Where we need to find second most recent activity and if user has only 1 activoty then return that as it is. We will use SQL window functions to solve this problem.*/
+create table UserActivity
+(
+username      varchar(20) ,
+activity      varchar(20),
+startDate     Date   ,
+endDate      Date
+);
+
+insert into UserActivity values ('Alice','Travel',to_date('2020-02-12','yyyy-mm-dd'),to_date('2020-02-20','yyyy-mm-dd'));
+insert into UserActivity values ('Alice','Dancing',to_date('2020-02-21','yyyy-mm-dd'),to_date('2020-02-23','yyyy-mm-dd'));
+insert into UserActivity values ('Alice','Travel',to_date('2020-02-24','yyyy-mm-dd'),to_date('2020-02-28','yyyy-mm-dd'));
+insert into UserActivity values ('Bob','Travel',to_date('2020-02-11','yyyy-mm-dd'),to_date('2020-02-18','yyyy-mm-dd'));
+
+select * from (
+select u.*,count(activity)over(partition by username) cnt, rank()over(partition by username order by startdate)rnk from UserActivity u
+)
+where cnt =1 or rnk=2;
