@@ -1,0 +1,29 @@
+/*find teh number of customers retained every month
+number of customers retained will be the customers ordered in current month and its previous month
+*/ 
+
+create table transactions(
+order_id int,
+cust_id int,
+order_date date,
+amount int
+);
+--delete from transactions;
+insert into transactions values (1,1,to_date('2020-01-15','yyyy-mm-dd'),150);
+insert into transactions values (2,1,to_date('2020-02-10','yyyy-mm-dd'),150);
+insert into transactions values (3,2,to_date('2020-01-16','yyyy-mm-dd'),150);
+insert into transactions values (4,2,to_date('2020-02-25','yyyy-mm-dd'),150);
+insert into transactions values (5,3,to_date('2020-01-10','yyyy-mm-dd'),150);
+insert into transactions values (6,3,to_date('2020-02-20','yyyy-mm-dd'),150);
+insert into transactions values (7,4,to_date('2020-01-20','yyyy-mm-dd'),150);
+insert into transactions values (8,5,to_date('2020-02-20','yyyy-mm-dd'),150);
+insert into transactions values (9,5,to_date('2020-03-20','yyyy-mm-dd'),150);
+insert into transactions values (10,5,to_date('2020-04-20','yyyy-mm-dd'),150);
+
+select curr_month,sum(diff) from(
+
+select t1.*,extract(month from order_date) curr_month, 
+extract(month from lag(t1.order_date,1)over(partition by cust_id order by t1.order_date)) next_mon  ,
+extract(month from order_date)-extract(month from lag(t1.order_date,1)over(partition by cust_id order by t1.order_date)) diff
+from transactions t1 )
+group by curr_month;
