@@ -1,0 +1,28 @@
+create table movie(
+seat varchar(50),occupancy int
+);
+insert into movie values('a1',1); 
+insert into movie values('a2',1); 
+insert into movie values('a3',0); 
+insert into movie values('a4',0); 
+insert into movie values('a5',0); 
+insert into movie values('a6',0); 
+insert into movie values('a7',1); 
+insert into movie values('a8',1); insert into movie values('a9',0); 
+insert into movie values('a10',0);
+insert into movie values('b1',0); 
+insert into movie values('b2',0);
+insert into movie values('b3',0); 
+insert into movie values('b4',1); insert into movie values('b5',1); insert into movie values('b6',1); insert into movie values('b7',1); insert into movie values('b8',0); insert into movie values('b9',0); insert into movie values('b10',0),
+('c1',0); 
+insert into movie values('c2',1); 
+insert into movie values('c3',0); insert into movie values('c4',1); insert into movie values('c5',1); insert into movie values('c6',0); insert into movie values('c7',1); insert into movie values('c8',0); insert into movie values('c9',0); insert into movie values('c10',1);
+
+select * from movie;
+with occu as(
+select m.*, substr(m.seat,1,1) aisle, substr(m.seat,2,1) seat_num, row_number()over(partition by substr(m.seat,1,1) order by seat) rk ,
+substr(m.seat,2,1) - row_number()over(partition by m.occupancy order by seat) grp
+from movie m  where m.occupancy=0 
+) 
+select * from occu b where (b.aisle,b.grp) in( select a.aisle,a.grp from occu a 
+group by a.aisle,a.grp having count(a.grp)>=3);
