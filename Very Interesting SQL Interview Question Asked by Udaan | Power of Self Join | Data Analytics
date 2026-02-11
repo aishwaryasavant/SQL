@@ -1,0 +1,18 @@
+create table business_city (
+business_date date,
+city_id int
+);
+delete from business_city;
+insert into business_city values(to_date('2020-01-02','yyyy-mm-dd'),3);
+insert into business_city values(to_date('2020-07-01','yyyy-mm-dd'),7);
+insert into business_city values(to_date('2021-01-01','yyyy-mm-dd'),3);
+insert into business_city values(to_date('2021-02-03','yyyy-mm-dd'),19);
+insert into business_city values(to_date('2022-12-01','yyyy-mm-dd'),3);
+insert into business_city values(to_date('2022-12-15','yyyy-mm-dd'),3);
+insert into business_city values(to_date('2022-02-28','yyyy-mm-dd'),12);
+
+select yr,count(city_id) from (
+select yr,city_id, rank()over(partition by city_id order by yr) rk from (
+select b.business_date,b.city_id,extract(year from business_date) yr from business_city b))
+where rk=1
+group by yr;
