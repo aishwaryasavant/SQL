@@ -1,0 +1,25 @@
+create table stadium (
+id int,
+visit_date date,
+no_of_people int
+);
+
+insert into stadium values (1,to_date('2017-07-01','yyyy-mm-dd'),10);
+insert into stadium values (2,to_date('2017-07-02','yyyy-mm-dd'),109);
+insert into stadium values (3,to_date('2017-07-03','yyyy-mm-dd'),150);
+insert into stadium values (4,to_date('2017-07-04','yyyy-mm-dd'),99);
+insert into stadium values (5,to_date('2017-07-05','yyyy-mm-dd'),145);
+insert into stadium values (6,to_date('2017-07-06','yyyy-mm-dd'),1455);
+insert into stadium values (7,to_date('2017-07-07','yyyy-mm-dd'),199);
+insert into stadium values (8,to_date('2017-07-08','yyyy-mm-dd'),188);
+
+with std_visit as (
+select s.id,s.visit_date,s.no_of_people, id - row_number()over(order by visit_date) gr,
+lead(id,1)over(order by visit_date)  ld,
+lead(id,1)over(order by visit_date) -id  diff
+from stadium s where no_of_people>=100
+)
+select * from std_visit where gr in(
+select gr from std_visit
+group by gr
+having count(1)>=3);
